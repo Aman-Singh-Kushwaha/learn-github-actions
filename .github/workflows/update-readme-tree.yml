@@ -1,0 +1,60 @@
+name: Update README on file changes
+
+# Triggers
+on:
+  push: 
+    paths:
+      - '**' # watch all file 
+    
+    branches: 
+      - main
+    
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install tree command
+        run: sudo apt-get install tree
+
+      - name: Generate Directory tree
+        run: |
+          tree -L 2 -I 'node_modules|.git|dist' | head -n -1 > structure.txt 
+
+      
+      - name: Update README.md
+        run: |
+          START='<!-- TREE START HERE -->'
+          END='<!-- TREE ENDS HERE -->'
+          CONTENT=$(cat structure.txt)
+
+          awk -v start="$START" -v end="$END" -v content="$CONTENT" '
+            BEGIN { replaced = 0 }
+            $0 ~ start && !replaced {
+              print $0
+              print "```"
+              print content
+              print "```"
+              skip = 1
+              next
+            }
+            $0 ~ end && skip {
+              print $0
+              skip = 0
+              replaced = 1
+              next
+            }
+            !skip
+          ' README.md > README.tmp && mv README.tmp README.md
+      
+      - name: Commit and push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git commit -m "chore: updated README tree [skip ci]" || echo "No changes"
+          git push

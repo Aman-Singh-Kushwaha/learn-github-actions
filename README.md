@@ -7,7 +7,7 @@
 
 ## Practice Workflows
 
-- ### [File Tree Update Workflow](.github/workflows/update-readme-tree.yaml)
+- ### [File Tree Update Workflow](.github/workflows/update-readme-tree.yml)
     Changes file tree whenever filepath added, deleted, updated
     
   #### 📁 Folder Structure
@@ -16,7 +16,7 @@
   .
   └── README.md
   ```
-  <!-- TREE START HERE -->
+  <!-- TREE ENDS HERE -->
 
 
 
