@@ -8,7 +8,9 @@ on:
     
     branches: 
       - main
-    
+
+permissions:
+  contents: write
 
 jobs:
   update-readme:
@@ -20,13 +22,33 @@ jobs:
 
       - name: Install tree command
         run: sudo apt-get install tree
+      
+      - name: Detect structural changes (added, deleted, moved)
+        id: structure-check
+        run: |
+          echo "Checking for file structural changes..."
+
+          # Get structural changes (Added, Deleted, Renamed)
+          git fetch origin main
+          STRUCTURAL_CHANGES=$(git diff --name-status HEAD^ | grep -E '^(A|D|R)' || true)
+
+          echo "Detected changes:"
+          echo "$STRUCTURAL_CHANGES"
+
+          # Set output for conditionally running next steps
+          if [ -n "$STRUCTURAL_CHANGES" ]; then
+            echo "structure_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "structure_changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generate Directory tree
+        if: steps.structure-check.outputs.structure_changed == 'true'
         run: |
           tree -L 2 -I 'node_modules|.git|dist' | head -n -1 > structure.txt 
-
       
       - name: Update README.md
+        if: steps.structure-check.outputs.structure_changed == 'true'
         run: |
           START='<!-- TREE START HERE -->'
           END='<!-- TREE ENDS HERE -->'
@@ -52,6 +74,7 @@ jobs:
           ' README.md > README.tmp && mv README.tmp README.md
       
       - name: Commit and push
+        if: steps.structure-check.outputs.structure_changed == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
