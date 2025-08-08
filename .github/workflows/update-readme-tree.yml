@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: Install tree command
         run: sudo apt-get install tree
@@ -27,9 +29,6 @@ jobs:
         id: structure-check
         run: |
           echo "Checking for file structural changes..."
-
-          # Fetch the main branch to compare against
-          git fetch origin main 
 
           # Get structural changes (Added, Deleted, Renamed)
           STRUCTURAL_CHANGES=$(git diff --name-status HEAD~1 | grep -E '^(A|D|R)' || true)
