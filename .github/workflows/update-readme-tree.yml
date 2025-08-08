@@ -28,6 +28,9 @@ jobs:
         run: |
           echo "Checking for file structural changes..."
 
+          # Fetch the main branch to compare against
+          git fetch origin main 
+
           # Get structural changes (Added, Deleted, Renamed)
           STRUCTURAL_CHANGES=$(git diff --name-status HEAD~1 | grep -E '^(A|D|R)' || true)
 
