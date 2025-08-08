@@ -12,10 +12,15 @@
     
   #### 📁 Folder Structure
   <!-- TREE START HERE -->
-  ```
-  .
-  └── README.md
-  ```
+```
+.
+├── README.md
+├── structure.txt
+├── test
+│   └── test_file.txt
+└── test_folder
+    └── test_file2.txt
+```
   <!-- TREE ENDS HERE -->
 
 
